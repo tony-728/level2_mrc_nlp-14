@@ -45,7 +45,7 @@ def main():
         do_train=True,
         do_eval=True,
         overwrite_output_dir=True,
-        output_dir="../models/train_dataset",  # output directory
+        output_dir=config["train_output_dir"],  # output directory
         save_total_limit=5,  # number of total save model.
         save_strategy="epoch",  # model saving step.
         num_train_epochs=config["epoch"],  # total number of training epochs
