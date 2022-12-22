@@ -46,15 +46,6 @@ def main():
     with open(f"../config/{model_args.config_file}", "r") as f:
         config = json.load(f)
 
-    if config["wandb"]:
-        wandb.login(key=config["wandb_key"])
-        entity = "mrc-14"
-        wandb.init(
-            entity=entity,
-            project=config["model_name_or_path"].replace("/", "-"),
-            name=f"{config['run_name']}(b:{config['batch_size']},e:{config['epoch']},lr:{config['lr']})",
-        )
-
     # 가능한 arguments 들은 ./arguments.py 나 transformer package 안의 src/transformers/training_args.py 에서 확인 가능합니다.
     # --help flag 를 실행시켜서 확인할 수 도 있습니다.
     training_args = TrainingArguments(
