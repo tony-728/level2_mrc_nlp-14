@@ -51,7 +51,7 @@ def main():
         entity = "mrc-14"
         wandb.init(
             entity=entity,
-            project=config["model_name"].replace("/", "-"),
+            project=config["model_name_or_path"].replace("/", "-"),
             name=f"{config['run_name']}(b:{config['batch_size']},e:{config['epoch']},lr:{config['lr']})",
         )
 
