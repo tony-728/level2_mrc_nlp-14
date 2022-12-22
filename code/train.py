@@ -55,7 +55,7 @@ def main():
         ],  # batch size per device during training
         per_device_eval_batch_size=config["batch_size"],  # batch size for evaluation
         warmup_steps=0,  # number of warmup steps for learning rate scheduler
-        weight_decay=0.0,  # strength of weight decay
+        weight_decay=0.01,  # strength of weight decay
         logging_dir="../logs",  # directory for storing logs
         logging_steps=100,  # log saving step.
         evaluation_strategy="epoch",  # evaluation strategy to adopt during training
