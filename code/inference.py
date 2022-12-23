@@ -8,7 +8,7 @@ Open-Domain Question Answering 을 수행하는 inference 코드 입니다.
 import json
 import logging
 import sys
-from typing import Callable, Dict, List, NoReturn, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 import wandb
@@ -184,7 +184,7 @@ def run_mrc(
     datasets: DatasetDict,
     tokenizer,
     model,
-) -> NoReturn:
+) -> None:
 
     # eval 혹은 prediction에서만 사용함
     column_names = datasets["validation"].column_names

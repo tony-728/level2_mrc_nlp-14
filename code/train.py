@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from typing import NoReturn
 
 import wandb
 from arguments import DataTrainingArguments, ModelArguments
@@ -126,7 +125,7 @@ def run_mrc(
     datasets: DatasetDict,
     tokenizer,
     model,
-) -> NoReturn:
+) -> None:
 
     # dataset을 전처리합니다.
     # training과 evaluation에서 사용되는 전처리는 아주 조금 다른 형태를 가집니다.

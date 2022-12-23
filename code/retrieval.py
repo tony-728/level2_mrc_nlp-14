@@ -3,7 +3,7 @@ import os
 import pickle
 import time
 from contextlib import contextmanager
-from typing import List, NoReturn, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import faiss
 import numpy as np
@@ -26,7 +26,7 @@ class SparseRetrieval:
         tokenize_fn,
         data_path: Optional[str] = "../data/",
         context_path: Optional[str] = "wikipedia_documents.json",
-    ) -> NoReturn:
+    ) -> None:
 
         """
         Arguments:
@@ -72,7 +72,7 @@ class SparseRetrieval:
         # self.p_embedding = None  # get_sparse_embedding()로 생성합니다
         # self.indexer = None  # build_faiss()로 생성합니다.
 
-    def get_sparse_embedding(self) -> NoReturn:
+    def get_sparse_embedding(self) -> None:
 
         """
         Summary:
@@ -84,6 +84,8 @@ class SparseRetrieval:
         # Pickle을 저장합니다.
         pickle_name = f"sparse_embedding.bin"
         tfidfv_name = f"tfidv.bin"
+        # pickle_name = f"sparse_embedding_title.bin"
+        # tfidfv_name = f"tfidv_title.bin"
         emd_path = os.path.join(self.data_path, pickle_name)
         tfidfv_path = os.path.join(self.data_path, tfidfv_name)
 
@@ -103,7 +105,7 @@ class SparseRetrieval:
                 pickle.dump(self.tfidfv, file)
             print("Embedding pickle saved.")
 
-    def build_faiss(self, num_clusters=64) -> NoReturn:
+    def build_faiss(self, num_clusters=64) -> None:
 
         """
         Summary:
@@ -120,6 +122,7 @@ class SparseRetrieval:
         """
 
         indexer_name = f"faiss_clusters{num_clusters}.index"
+        # indexer_name = f"faiss_clusters{num_clusters}_title.index"
         indexer_path = os.path.join(self.data_path, indexer_name)
         if os.path.isfile(indexer_path):
             print("Load Saved Faiss Indexer.")
@@ -398,7 +401,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("--data_path", metavar="../data", type=str, help="")
     parser.add_argument(
-        "--context_path", metavar="wikipedia_documents", type=str, help=""
+        # "--context_path", metavar="wikipedia_documents", type=str, help=""
+        "--context_path",
+        metavar="wikipedia_title",
+        type=str,
+        help="",
     )
     parser.add_argument("--use_faiss", metavar=False, type=bool, help="")
 
