@@ -5,13 +5,11 @@ Open-Domain Question Answering 을 수행하는 inference 코드 입니다.
 """
 
 
-import json
 import logging
 import sys
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, NoReturn, Tuple
 
 import numpy as np
-import wandb
 from arguments import DataTrainingArguments, ModelArguments
 from datasets import (
     Dataset,
@@ -22,7 +20,7 @@ from datasets import (
     load_from_disk,
     load_metric,
 )
-from retrieval import SparseRetrieval
+from retrieval_bm25 import SparseRetrieval
 from trainer_qa import QuestionAnsweringTrainer
 from transformers import (
     AutoConfig,
@@ -40,36 +38,15 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments))
-    model_args, data_args = parser.parse_args_into_dataclasses()
-
-    with open(f"../config/{model_args.config_file}", "r") as f:
-        config = json.load(f)
-
     # 가능한 arguments 들은 ./arguments.py 나 transformer package 안의 src/transformers/training_args.py 에서 확인 가능합니다.
     # --help flag 를 실행시켜서 확인할 수 도 있습니다.
-    training_args = TrainingArguments(
-        do_predict=True,
-        output_dir=config["inference_output_dir"],  # output directory
-        save_total_limit=5,  # number of total save model.
-        save_strategy="epoch",  # model saving step.
-        num_train_epochs=config["epoch"],  # total number of training epochs
-        learning_rate=config["lr"],  # learning_rate
-        per_device_train_batch_size=config[
-            "batch_size"
-        ],  # batch size per device during training
-        per_device_eval_batch_size=config["batch_size"],  # batch size for evaluation
-        warmup_steps=0,  # number of warmup steps for learning rate scheduler
-        weight_decay=0.0,  # strength of weight decay
-        logging_dir="../logs",  # directory for storing logs
-        logging_steps=100,  # log saving step.
-        gradient_accumulation_steps=config[
-            "accumulation_step"
-        ],  # gradient accumulation step
-    )
 
-    model_args.model_name_or_path = config["train_output_dir"]  # config에서 입력받도록 수정
-    data_args.dataset_name = config["test_dataset"]
+    parser = HfArgumentParser(
+        (ModelArguments, DataTrainingArguments, TrainingArguments)
+    )
+    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    training_args.do_train = False
 
     print(f"model is from {model_args.model_name_or_path}")
     print(f"data is from {data_args.dataset_name}")
@@ -109,13 +86,11 @@ def main():
         config=config,
     )
 
-    # True일 경우 : run passage retrieval
+    # True일 경우 : run passage retrieval ??? 뭐가 True라는겨 왜 inference에만 있어? retrieval?
     if data_args.eval_retrieval:
+        temp_tokenizer = AutoTokenizer.from_pretrained('klue/bert-base')
         datasets = run_sparse_retrieval(
-            tokenizer.tokenize,
-            datasets,
-            training_args,
-            data_args,
+            temp_tokenizer.tokenize, datasets, training_args, data_args,
         )
 
     # eval or predict mrc model
@@ -184,7 +159,7 @@ def run_mrc(
     datasets: DatasetDict,
     tokenizer,
     model,
-) -> None:
+) -> NoReturn:
 
     # eval 혹은 prediction에서만 사용함
     column_names = datasets["validation"].column_names
@@ -303,7 +278,7 @@ def run_mrc(
         args=training_args,
         train_dataset=None,
         eval_dataset=eval_dataset,
-        eval_examples=datasets["validation"],
+        eval_examples=datasets["validation"], # 전처리 되지 않은 데이터를 알고자 examples를 그대로 받아옴
         tokenizer=tokenizer,
         data_collator=data_collator,
         post_process_function=post_processing_function,
