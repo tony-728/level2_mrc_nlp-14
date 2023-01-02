@@ -43,6 +43,21 @@ class USWAttention(nn.Module):
         v_x = #input sequence value 
         k_cp = 
 
+
+    def get_d_matrix(max_length, alpha, beta, gamma):
+        d_matrix = np.zeros((max_length, max_length))
+        for i in range(max_length):
+            for j in range(max_length):
+                if i==j:
+                    d_matrix[i,j] = 0
+                elif i>j:
+                    d_matrix[i,j] = beta * (i-j)
+                else:
+                    d_matrix[i,j] = gamma * (j-i)
+        d_matrix[0,1:] = alpha
+        d_matrix[1:, 0] = alpha
+
+        return torch.Tensor(d_matrix)
 """
 class MultiHeadAttention(nn.Module):
     def __init__(self, config)->None:
